@@ -5,6 +5,9 @@ import {
   SchemaDefinitionProperty,
   Model,
   model,
+  connect,
+  Mongoose,
+  ConnectOptions,
 } from 'mongoose';
 
 export type SchemaArrayObject = {
@@ -19,6 +22,7 @@ export type PropertyArrayObject = {
 };
 
 export class SchemaBuilder {
+  private connection: Promise<Mongoose>;
   private schemas: Map<Function, SchemaArrayObject> = new Map();
   private properties: Array<PropertyArrayObject> = [];
 
@@ -63,10 +67,14 @@ export class SchemaBuilder {
     const propertyMeta = this.getProperties(target);
     return new Schema(propertyMeta, schemaMeta.options);
   }
-  getMongoModel<T extends Function>(target: T): Model<T> {
+  async getMongoModel<T extends Function>(target: T): Promise<Model<T>> {
+    const db = await this.connection;
     const schemaMeta = this.getSchema(target);
     const schema = this.getMongoSchema(target);
-    return model<T>(schemaMeta.name, schema);
+    return db.model<T>(schemaMeta.name, schema);
+  }
+  connect(uri: string, options: ConnectOptions) {
+    this.connection = connect(uri, options);
   }
 }
 
