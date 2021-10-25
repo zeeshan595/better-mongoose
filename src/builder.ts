@@ -74,7 +74,7 @@ export class SchemaBuilder {
     const schema = this.getMongoSchema(target);
     return db.model<T>(schemaMeta.name, schema);
   }
-  connect(uri: string, options: ConnectOptions) {
+  connect(uri: string, options?: ConnectOptions) {
     this.connection = connect(uri, options);
   }
 }
