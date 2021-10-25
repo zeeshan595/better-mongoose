@@ -1,8 +1,10 @@
 {
   "name": "better-mongoose",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A more friendly to use mongoose with typescript decorators",
-  "scripts": {},
+  "scripts": {
+    "build": "tsc"
+  },
   "keywords": [
     "mongoose",
     "decorators",
@@ -18,5 +20,8 @@
     "mongoose": "^6.0.12",
     "reflect-metadata": "^0.1.13",
     "tslib": "^2.3.1"
-  }
+  },
+  "files": [
+    "lib/**/*"
+  ]
 }

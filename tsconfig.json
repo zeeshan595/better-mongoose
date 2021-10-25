@@ -11,13 +11,14 @@
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "sourceMap": true,
+    "declaration": true,
     "baseUrl": ".",
     "rootDir": ".",
-    "outDir": "build",
+    "outDir": "./lib",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "builder.ts"],
   "exclude": ["node_modules", "build"]
 }
