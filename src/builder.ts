@@ -37,6 +37,7 @@ export class SchemaBuilder {
   }
   addProperty(
     target: Function,
+    schemaTarget: Function,
     key: string | symbol,
     options: SchemaDefinitionProperty<any>
   ): void {
@@ -44,7 +45,7 @@ export class SchemaBuilder {
       type: Reflect.getMetadata('design:type', target, key),
     };
     this.properties.push({
-      target,
+      target: schemaTarget,
       key,
       options: options || fallBackOptions,
     });

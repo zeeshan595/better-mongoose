@@ -11,6 +11,6 @@ export const Property = (
   options?: SchemaDefinitionProperty<any>
 ): PropertyDecorator => {
   return (target: Function, key: string | symbol) => {
-    schemaBuilder.addProperty(target, key, options);
+    schemaBuilder.addProperty(target, target.constructor, key, options);
   };
 };
