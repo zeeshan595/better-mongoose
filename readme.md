@@ -44,6 +44,7 @@ export class User {
   lastname: string;
 }
 
+// find single user using object id
 async function FindUser() {
   const userModel = await getModel(User);
   const findResult = await userModel.findOne({
@@ -62,7 +63,7 @@ async function GetUsers() {
     .limit(limit);
 }
 
-// create using using `getCollection`
+// create user using `getCollection`
 async function CreateUser() {
   const userCollection = await getCollection(User);
   const insertResult = await userCollection.insertOne({
@@ -71,5 +72,4 @@ async function CreateUser() {
     lastname: 'Doe',
   });
 }
-// query
 ```

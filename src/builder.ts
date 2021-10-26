@@ -7,6 +7,7 @@ import {
   Mongoose,
   ConnectOptions,
   Collection,
+  Schema,
 } from 'mongoose';
 
 export type SchemaArrayObject = {
@@ -25,7 +26,8 @@ export class SchemaBuilder {
   private connection: Promise<Mongoose>;
   private schemas: Array<SchemaArrayObject> = [];
   private properties: Array<PropertyArrayObject> = [];
-  private models: Map<Function, Model<any>> = new Map();
+  private mongoSchema: Map<Function, Schema<any>> = new Map();
+  private mongoModels: Map<Function, Model<any>> = new Map();
 
   addSchema(target: Function, options?: SchemaOptions): void {
     this.schemas.push({
@@ -51,14 +53,17 @@ export class SchemaBuilder {
   }
   async getMongoModel<T extends Function>(target: T): Promise<Model<T>> {
     await this.connection;
-    return this.models.get(target);
+    return this.mongoModels.get(target);
   }
   async getMongoCollection<T extends Function>(target: T): Promise<Collection> {
     await this.connection;
-    return this.models.get(target).collection;
+    return this.mongoModels.get(target).collection;
   }
   async getConnection(): Promise<Mongoose> {
     return await this.connection;
+  }
+  getSchema<T extends Function>(target: T): Schema<T> {
+    return this.mongoSchema.get(target);
   }
   connect(uri: string, options?: ConnectOptions) {
     this.connection = new Promise(async (resolve, reject) => {
@@ -80,7 +85,8 @@ export class SchemaBuilder {
             schemaProperties,
             schema.options
           );
-          this.models.set(
+          this.mongoSchema.set(schema.target, mongooseSchema);
+          this.mongoModels.set(
             schema.target,
             db.model<any>(schema.name, mongooseSchema)
           );
