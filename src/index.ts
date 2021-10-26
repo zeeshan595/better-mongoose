@@ -1,4 +1,4 @@
-import { Collection, ConnectOptions, Model, Mongoose } from 'mongoose';
+import { Collection, ConnectOptions, Model, Mongoose, Schema } from 'mongoose';
 import { schemaBuilder } from './builder';
 
 //export schema builder objects
@@ -23,3 +23,7 @@ export const getModel = <T extends Function>(target: T): Promise<Model<T>> =>
 export const getCollection = <T extends Function>(
   target: T
 ): Promise<Collection> => schemaBuilder.getMongoCollection(target);
+
+// get schema
+export const getSchema = <T extends Function>(target: T): Schema<T> =>
+  schemaBuilder.getSchema(target);
