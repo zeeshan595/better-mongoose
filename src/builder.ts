@@ -6,12 +6,9 @@ import {
   connect,
   Mongoose,
   ConnectOptions,
-  Collection,
-  Schema,
 } from 'mongoose';
 
 export type SchemaArrayObject = {
-  target: Function;
   name: string;
   options: SchemaOptions;
 };
@@ -24,78 +21,60 @@ export type PropertyArrayObject = {
 
 export class SchemaBuilder {
   private connection: Promise<Mongoose>;
-  private schemas: Array<SchemaArrayObject> = [];
+  private schemas: Map<Function, SchemaArrayObject> = new Map();
   private properties: Array<PropertyArrayObject> = [];
-  private mongoSchema: Map<Function, Schema<any>> = new Map();
-  private mongoModels: Map<Function, Model<any>> = new Map();
+  private model: Map<Function, Model<any>> = new Map();
 
+  // setup schema options
   addSchema(target: Function, options?: SchemaOptions): void {
-    this.schemas.push({
-      target,
+    this.schemas.set(target, {
       name: target.name,
       options,
     });
   }
+
+  // add schema property
   addProperty(
     target: Function,
     schemaTarget: Function,
     key: string | symbol,
     options: SchemaDefinitionProperty<any>
   ): void {
-    const fallBackOptions: any = {
-      type: Reflect.getMetadata('design:type', target, key),
-    };
     this.properties.push({
       target: schemaTarget,
       key,
-      options: options || fallBackOptions,
+      options,
     });
   }
-  async getMongoModel<T extends Function>(target: T): Promise<Model<T>> {
-    await this.connection;
-    return this.mongoModels.get(target);
-  }
-  async getMongoCollection<T extends Function>(target: T): Promise<Collection> {
-    await this.connection;
-    return this.mongoModels.get(target).collection;
-  }
-  async getConnection(): Promise<Mongoose> {
-    return await this.connection;
-  }
-  getSchema<T extends Function>(target: T): Schema<T> {
-    return this.mongoSchema.get(target);
-  }
-  connect(uri: string, options?: ConnectOptions) {
-    this.connection = new Promise(async (resolve, reject) => {
-      try {
-        const db = await connect(uri, options);
-        for (const schema of this.schemas) {
-          // get schema properties object
-          const schemaProperties = this.properties
-            .filter((prop) => prop.target === schema.target)
-            .reduce(
-              (prev, next) => ({
-                ...prev,
-                [next.key]: next.options,
-              }),
-              {}
-            );
 
-          const mongooseSchema = new db.Schema(
-            schemaProperties,
-            schema.options
-          );
-          this.mongoSchema.set(schema.target, mongooseSchema);
-          this.mongoModels.set(
-            schema.target,
-            db.model<any>(schema.name, mongooseSchema)
-          );
-        }
-        resolve(db);
-      } catch (e) {
-        reject(e);
-      }
-    });
+  // get model from mongoose
+  async getModel<T extends Function>(target: T): Promise<Model<T>> {
+    if (this.model.has(target)) {
+      return this.model.get(target);
+    }
+
+    const conn = await this.connection;
+
+    const sch = this.schemas.get(target);
+    const properties = this.properties
+      .filter((prop) => prop.target === target)
+      .reduce(
+        (prev, next) => ({
+          ...prev,
+          [next.key]: next.options,
+        }),
+        {}
+      );
+
+    const schema = new conn.Schema(properties, sch.options);
+    const model = conn.model(sch.name, schema);
+    this.model.set(target, model);
+    return model;
+  }
+
+  // connect to the database
+  connect(uri: string, options?: ConnectOptions) {
+    this.connection = connect(uri, options);
   }
 }
 

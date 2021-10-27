@@ -29,9 +29,6 @@ connect('mongodb://root:myPassword@localhost:27017/?ssl=false');
 // create your structure
 @Schema(/* Mongoose schema options here */)
 export class User {
-  @Property()
-  _id: string;
-
   @Property(/* Mongoose Property options here */)
   username: string;
 
@@ -63,13 +60,40 @@ async function GetUsers() {
     .limit(limit);
 }
 
-// create user using `getCollection`
+// create user using model
 async function CreateUser() {
-  const userCollection = await getCollection(User);
-  const insertResult = await userCollection.insertOne({
+  const userModel = await getModel(User);
+  const insertResult = await userModel.create({
     username: 'john',
     firstname: 'john',
     lastname: 'Doe',
   });
+}
+```
+
+`supports arrays and sub-collections`
+
+```ts
+@Schema()
+export class Tool {
+  @Property()
+  name: string;
+}
+
+export class Details {
+  @Property()
+  address: string;
+}
+
+@Schema()
+export class User {
+  @Property()
+  username: string;
+  
+  @Property()
+  tools: SubCollection[];
+
+  @Property()
+  details: Details;
 }
 ```
