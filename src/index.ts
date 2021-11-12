@@ -11,4 +11,5 @@ export { Property, Schema } from './decorators';
 export const connect = (uri: string, options?: ConnectOptions) =>
   schemaBuilder.connect(uri, options);
 
-export const getModel = (target: Function) => schemaBuilder.getModel(target);
+export const getModel = (target: Function, database?: string) =>
+  schemaBuilder.getModel(target, database);
