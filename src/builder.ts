@@ -19,6 +19,10 @@ export type PropertyArrayObject = {
   options: SchemaDefinitionProperty<any>;
 };
 
+export interface SchemaOptionsExtended extends SchemaOptions {
+  name?: string;
+}
+
 export class SchemaBuilder {
   private connection: Promise<Mongoose>;
   private schemas: Map<Function, SchemaArrayObject> = new Map();
@@ -26,9 +30,13 @@ export class SchemaBuilder {
   private model: Map<Function, Model<any>> = new Map();
 
   // setup schema options
-  addSchema(target: Function, options?: SchemaOptions): void {
+  addSchema(target: Function, options?: SchemaOptionsExtended): void {
+    let name = options.name;
+    if (!options.name) {
+      name = target.name;
+    }
     this.schemas.set(target, {
-      name: target.name,
+      name,
       options,
     });
   }

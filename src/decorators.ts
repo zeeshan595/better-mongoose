@@ -1,14 +1,13 @@
 import {
   SchemaDefinitionProperty,
-  SchemaOptions,
   SchemaType,
   Types,
   Schema as MongooseSchema,
 } from 'mongoose';
-import { schemaBuilder, SchemaBuilder } from './builder';
+import { schemaBuilder, SchemaBuilder, SchemaOptionsExtended } from './builder';
 
 export const Schema = (
-  options?: SchemaOptions,
+  options?: SchemaOptionsExtended,
   builder: SchemaBuilder = schemaBuilder
 ): ClassDecorator => {
   return (target: Function) => {
