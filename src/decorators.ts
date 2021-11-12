@@ -5,16 +5,20 @@ import {
   Types,
   Schema as MongooseSchema,
 } from 'mongoose';
-import { schemaBuilder } from './builder';
+import { schemaBuilder, SchemaBuilder } from './builder';
 
-export const Schema = (options?: SchemaOptions): ClassDecorator => {
+export const Schema = (
+  options?: SchemaOptions,
+  builder: SchemaBuilder = schemaBuilder
+): ClassDecorator => {
   return (target: Function) => {
-    schemaBuilder.addSchema(target, options);
+    builder.addSchema(target, options);
   };
 };
 
 export const Property = (
-  options?: SchemaDefinitionProperty<any>
+  options?: SchemaDefinitionProperty<any>,
+  builder: SchemaBuilder = schemaBuilder
 ): PropertyDecorator => {
   return (target: Function, key: string | symbol) => {
     if (!options) {
@@ -27,7 +31,7 @@ export const Property = (
       options['type'] = Reflect.getMetadata('design:type', target, key);
     }
     options['type'] = getMongoType(options['type']);
-    schemaBuilder.addProperty(target, target.constructor, key, options);
+    builder.addProperty(target, target.constructor, key, options);
   };
 };
 
