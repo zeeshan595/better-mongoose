@@ -6,6 +6,7 @@ import {
   connect,
   Mongoose,
   ConnectOptions,
+  connection,
 } from 'mongoose';
 
 export type SchemaArrayObject = {
@@ -56,12 +57,19 @@ export class SchemaBuilder {
   }
 
   // get model from mongoose
-  async getModel<T extends Function>(target: T): Promise<Model<T>> {
+  async getModel<T extends Function>(
+    target: T,
+    database?: string
+  ): Promise<Model<T>> {
     if (this.model.has(target)) {
       return this.model.get(target);
     }
 
     const conn = await this.connection;
+
+    if (database) {
+      connection.useDb(database);
+    }
 
     const sch = this.schemas.get(target);
     const properties = this.properties

@@ -4,20 +4,16 @@ import {
   Types,
   Schema as MongooseSchema,
 } from 'mongoose';
-import { schemaBuilder, SchemaBuilder, SchemaOptionsExtended } from './builder';
+import { schemaBuilder, SchemaOptionsExtended } from './builder';
 
-export const Schema = (
-  options?: SchemaOptionsExtended,
-  builder: SchemaBuilder = schemaBuilder
-): ClassDecorator => {
+export const Schema = (options?: SchemaOptionsExtended): ClassDecorator => {
   return (target: Function) => {
-    builder.addSchema(target, options);
+    schemaBuilder.addSchema(target, options);
   };
 };
 
 export const Property = (
-  options?: SchemaDefinitionProperty<any>,
-  builder: SchemaBuilder = schemaBuilder
+  options?: SchemaDefinitionProperty<any>
 ): PropertyDecorator => {
   return (target: Function, key: string | symbol) => {
     if (!options) {
@@ -30,7 +26,7 @@ export const Property = (
       options['type'] = Reflect.getMetadata('design:type', target, key);
     }
     options['type'] = getMongoType(options['type']);
-    builder.addProperty(target, target.constructor, key, options);
+    schemaBuilder.addProperty(target, target.constructor, key, options);
   };
 };
 
