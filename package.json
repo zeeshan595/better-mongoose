@@ -1,6 +1,6 @@
 {
   "name": "better-mongoose",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A more friendly to use mongoose with typescript decorators",
   "scripts": {
     "build": "tsc && cp package.json lib/src/package.json && cp readme.md lib/src/readme.md"
